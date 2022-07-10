@@ -27,3 +27,13 @@ jobs:
 
       - name: Run tests
         run: npm run test
+
+      - name: Send positive message in Slack
+        if: ${{ success() }}
+        run:         
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"The job in CICD Learn has succeeded"}' https://hooks.slack.com/services/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
+
+      - name: Send negative message in Slack
+        if: ${{ success() }}
+        run:         
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"The job in CICD Learn has NOT succeeded!"}' https://hooks.slack.com/services/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
