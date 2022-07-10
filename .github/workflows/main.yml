@@ -19,21 +19,45 @@ jobs:
       - name: Run a one-line script
         run: echo Hello, world!
 
-      - name: Install dependencies
-        run: npm ci
+      #- name: Install dependencies
+      #  run: npm ci
 
-      - name: Build assets
-        run: npm run build
+      #- name: Build assets
+      #  run: npm run build
 
-      - name: Run tests
-        run: npm run test
+      #- name: Run tests
+      #  run: npm run test
+      
+      #- name: Send message to Slack API
+      #  uses: archive/github-actions-slack@v2.0.0
+      #  id: notify
+      #  with:
+      #    slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+      #    slack-channel: D02J4E5HQ87
+      #    slack-text: Hello! Event "${{ github.event_name }}" in "${{ github.repository }}" 🤓
 
-      - name: Send positive message in Slack
-        if: ${{ success() }}
-        run:         
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"The job in CICD Learn has succeeded"}' https://hooks.slack.com/services/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
+      #- name: Send Slack Message Result
+      #  run: echo "${{ steps.send-message.outputs.slack-result }}"
 
-      - name: Send negative message in Slack
-        if: ${{ success() }}
-        run:         
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"The job in CICD Learn has NOT succeeded!"}' https://hooks.slack.com/services/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
+      #- name: Post to a Slack channel
+      #  id: notify2
+      #  uses: slackapi/slack-github-action@v1.19.0
+      #  with:
+      #    # Slack channel id, channel name, or user id to post message.
+      #    # See also: https://api.slack.com/methods/chat.postMessage#channels
+      #    channel-id: 'D02J4E5HQ87'
+      #    # For posting a simple plain text message
+      #    slack-message: "GitHub build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+      #  env:
+      #    SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+
+      - name: Send custom JSON data to Slack workflow
+        id: slack
+        uses: slackapi/slack-github-action@v1.19.0
+        with:
+         payload: |
+          {
+            "text": "Наконец-то!!! GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+          }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
