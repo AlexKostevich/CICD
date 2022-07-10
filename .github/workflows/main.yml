@@ -1,39 +1,38 @@
 name: Learn CICD
 
 on:
-  #push:
-  #  branches: [ "develop" ]
+  push:
+    branches: [ "develop" ]
   pull_request:
     branches: [ "master" ]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
       - name: Run a one-line script
         run: echo Hello, world!
 
-      - name: Install dependencies
-        run: npm ci
+      #- name: Install dependencies
+      #  run: npm ci
 
-      - name: Build assets
-        run: npm run build
+      #- name: Build assets
+      #  run: npm run build
 
-      - name: Run tests
-        run: npm run test
-
-      - name: Send positive message in Slack
-        if: ${{ success() }}
-        run:         
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"The job in CICD Learn has succeeded"}' https://hooks.slack.com/services/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
-
-      - name: Send negative message in Slack
-        if: ${{ success() }}
-        run:         
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"The job in CICD Learn has NOT succeeded!"}' https://hooks.slack.com/services/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
+      #- name: Run tests
+      #  run: npm run test
+      
+      # need add SLACK_WEBHOOK_URL in github.com => repository => setting => secrets
+      - name: Send SLack message
+        id: slack
+        uses: slackapi/slack-github-action@v1.19.0
+        with:
+         payload: |
+          {
+            "text": "Наконец-то!!! GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+          }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
